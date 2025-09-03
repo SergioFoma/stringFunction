@@ -1,3 +1,4 @@
+#include <TXLib.h>
 #include "allFunction.h"
 
 #include <stdio.h>
@@ -17,13 +18,13 @@ int main() {
 	printf("\n%u", myStrlen( "Hello, world!" ) );
 	
 	char copy_line[ 50 ] = "";
-	const char* line = "Hello world from strcpy";
+	const char line[] = "Hello world from strcpy";
 	
 	char* result = myStrcpy( copy_line, line );
 	printf("\n%s", result );
 
     char copyLine[ 50 ] = "";
-    const char* Line = "Hello world from strncpy";
+    const char Line[] = "Hello world from strncpy";
 
     result = myStrncpy( copyLine, Line, 10 );
     printf("\n%s", result );
@@ -53,6 +54,7 @@ int main() {
 
     char str[ 10 ] = "Hello";
     char* copyStr = myStrdup( str );
+    free( str );
 
     if ( copyStr != NULL ) {
         printf("\n%s\n", copyStr );
@@ -71,5 +73,8 @@ int main() {
     }
     free( line_ );
 
+    const char* myLine = "123";
+    int myResult = myAtoi( myLine );
+    printf("строка 123 как число это: %d", myResult );
     return 0;
 }

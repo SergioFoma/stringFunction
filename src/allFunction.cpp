@@ -115,6 +115,22 @@ char* myStrncat( char* strDestination, const char* strSource, size_t count ) {
 
 }
 
+int myAtoi( const char* line) {
+
+    if ( line == NULL ) {
+        return 0;
+    }
+
+    int resultNumber = 0, index = 0;
+    while( line[ index ] != '\0' ) {
+        
+        resultNumber = resultNumber* 10 + ( line[ index ] - '0' );
+        ++index;
+    }
+
+    return resultNumber;
+}
+
 char* myFgets( char* str, int numChars, FILE* stream ) {
 
     int index = 0, c = '0';
@@ -131,7 +147,6 @@ char* myFgets( char* str, int numChars, FILE* stream ) {
 }
 
 char* myStrdup( const char* line ) {
-
     char* copy = ( char* )calloc( myStrlen( line ), sizeof( char ) );
 
     if ( copy == NULL ) {
