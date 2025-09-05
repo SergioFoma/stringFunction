@@ -1,5 +1,5 @@
-#ifndef H_ALLFUNCTION
-#define H_ALLFUNCTION
+#ifndef H_MYSTRINGFUNCTION
+#define H_MYSTRINGFUNCTION
 
 #include <stdio.h>
 #include <unistd.h>

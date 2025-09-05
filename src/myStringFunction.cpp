@@ -1,4 +1,4 @@
-#include "allFunction.h"
+#include "myStringFunction.h"
 
 #include <malloc.h>
 
@@ -43,10 +43,7 @@ size_t myStrlen( const char* line ) {
     
     int index = 0;
     
-    while ( line[ index ] != '\0' ) {
-        
-        ++index;
-    }
+    while ( line[ index++ ] != '\0' );
     
     return index;
 }
@@ -167,40 +164,43 @@ char* myStrdup( const char* line ) {
 
 ssize_t myGetline( char** line, size_t* n, FILE* stream ) {
 
-    if ( line == NULL ) {
+    const size_t startSize = 32;
+
+    if( line == NULL ) {
         return -1;
     }
 
-    const size_t startSize = 32;
-
     if ( *line == NULL ) {
-
-        *line = ( char* )calloc( startSize , sizeof( char ) );
+        char* tryLine =( char* )calloc( startSize, sizeof( char ) );
+        
+        if ( tryLine == NULL ) {
+            return -1;
+        }
         *n = startSize;
+        *line = tryLine;
     }
 
-    int getChar = '0';
-    ssize_t index = 0;
+    int getChar = 0;
+    ssize_t indexCopyLine = 0;
 
-    while( ( getChar = fgetc( stream ) ) != '\n') {
+    while( ( getChar = fgetc( stream) ) != '\n' && getChar != EOF ) {
 
-        if ( index  == ( *n - 1 ) ) {
+        if ( indexCopyLine == ( *n - 1 ) ) {
+            char* tryLine = ( char* )realloc( *line, 2 * (*n) );
 
-            char* tryAllocateMemory = ( char* )realloc( *line, *n * 2);
-
-            if ( tryAllocateMemory == NULL ) {
+            if ( tryLine == NULL ) {
                 return -1;
             }
-            else {
-                *line = tryAllocateMemory;
-            }
-            *n *= 2;
+            *line = tryLine;
+
+            ( *n ) *= 2;
         }
 
-        (*line)[ index++ ] = getChar;
+        (*line)[ indexCopyLine++  ] = getChar;
     }
 
-    ((*line)[ index ]) = '\0';
+    (*line)[ indexCopyLine ] = '\0';
+    
+    return indexCopyLine;
 
-    return index;
 }
