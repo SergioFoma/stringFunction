@@ -12,7 +12,7 @@ FLAGS = -Wshadow -Winit-self -Wredundant-decls -Wcast-align \
 
 EXE_NAME = $(BUILD_DIR)/Result.exe
 
-SOURCES = testStringFunction.cpp myStringFunction.cpp
+SOURCES = testStringFunction.cpp myStringFunction.cpp parsingText.cpp
 OBJECTS = $(SOURCES:.cpp=.obj) 
 
 OBJECTS_IN_SOURCE = $(addprefix src/, $(OBJECTS))

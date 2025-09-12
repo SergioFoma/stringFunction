@@ -1,14 +1,21 @@
 #include <TXLib.h>
 #include "myStringFunction.h"
+#include "parsingText.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-
-int main() {
+int main( int argc, char** argv) {
 	
-	myPuts( "Hello world" );
+    if ( argc > 1 && strcmp( argv[1], "--read") == 0) {
+        if( !ReadText() ){
+            printf("\nError of open file\n");
+        }
+        return 0;
+    }
+	
+    myPuts( "Hello world" );
 	
 	char* tryStrchr = myStrchr( "Hello World", 'e' );
 	
@@ -69,12 +76,13 @@ int main() {
         printf("Result of getline: %s %zd\n", bufer , tryGetline );
     }
     else {
-        printf("Ошибка считывания строки");
+        printf("\nError of open file\n");
     }
     free( bufer );
 
     const char* myLine = "123";
     int tryAtoi = myAtoi( myLine );
-    printf("строка 123 как число это: %d", tryAtoi );
+    printf("line 123 like number: %d", tryAtoi );
+
     return 0;
 }

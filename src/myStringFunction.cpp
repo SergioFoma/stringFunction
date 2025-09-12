@@ -132,11 +132,12 @@ char* myFgets( char* str, int numChars, FILE* stream ) {
 
     int index = 0, c = '0';
 
-    while ( index < numChars && ( c = fgetc( stream ) ) != EOF ) {
+    while ( index < numChars && ( c = fgetc( stream ) ) != EOF && c != '\n' ) {
 
         str[ index++ ] = c;
     }
-
+    
+    if ( c == '\n') str[index++] = '\n';
     str[ index ] = '\0';
 
     return str;
