@@ -12,6 +12,6 @@ char* cleanLine( char* lineFromText );
 
 void changeLine( char** firstLine, char** secondLine);
 
-void doSwap( char** line_1, char** line_2, const size_t Size );
+void doSwap( char* line_1, char* line_2, const size_t Size );
 
 #endif

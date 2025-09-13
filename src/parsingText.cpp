@@ -26,13 +26,13 @@ void changeLine( char** firstLine, char** secondLine) {
     (*secondLine) = tmp;
 }
 
-void doSwap( char** line_1, char** line_2, const size_t Size ) {
+void doSwap( char* line_1, char* line_2, const size_t Size ) {
     size_t index = 0;
 
     while( index < Size ) {
-        char tmp = *( *(line_1) + index );
-        *( *(line_1) + index ) = *( *(line_2) + index);
-        *( *(line_2) + index )= tmp;
+        char tmp = *(line_1 + index );
+        *(line_1 + index ) = *(line_2 + index );
+        *(line_2 + index ) = tmp;
         ++index;
     }
 }
@@ -87,7 +87,7 @@ void printText() {
         myFgets( text[ line ], maxLen, File );
     }
 
-    doSwap( (char**)(text) + 0 , (char**)(text) + 1 , maxLen );
+    doSwap( text[0], text[1] , maxLen );
 
     for ( size_t line = 0; line < count; line++ ) {
         printf("%s", text[ line ] );
