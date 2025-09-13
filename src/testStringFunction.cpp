@@ -1,20 +1,9 @@
-#include <TXLib.h>
 #include "myStringFunction.h"
-#include "parsingText.h"
+#include "testStringFunction.h"
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
-int main( int argc, char** argv) {
-	
-    if ( argc > 1 && strcmp( argv[1], "--read") == 0) {
-        if( !ReadText() ){
-            printf("\nError of open file\n");
-        }
-        return 0;
-    }
-	
+void testMyFunction() {
     myPuts( "Hello world" );
 	
 	char* tryStrchr = myStrchr( "Hello World", 'e' );
@@ -84,5 +73,4 @@ int main( int argc, char** argv) {
     int tryAtoi = myAtoi( myLine );
     printf("line 123 like number: %d", tryAtoi );
 
-    return 0;
 }

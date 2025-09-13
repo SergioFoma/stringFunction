@@ -145,7 +145,7 @@ char* myFgets( char* str, int numChars, FILE* stream ) {
 }
 
 char* myStrdup( const char* line ) {
-    char* copy = ( char* )calloc( myStrlen( line ), sizeof( char ) );
+    char* copy = ( char* )calloc( myStrlen( line ) + 1, sizeof( char ) );
 
     if ( copy == NULL ) {
         return NULL;
