@@ -1,6 +1,7 @@
 #include "myStringFunction.h"
 
 #include <malloc.h>
+#include <assert.h>
 
 int myPuts( const char* line ) {
     
@@ -20,6 +21,7 @@ int myPuts( const char* line ) {
 }
 
 char* myStrchr( const char* line, int ch ) {
+    assert( line != NULL );
     
     int index = 0;
     
@@ -40,6 +42,7 @@ char* myStrchr( const char* line, int ch ) {
 
 
 size_t myStrlen( const char* line ) {
+    assert( line != NULL );
     
     int index = 0;
     
@@ -49,6 +52,8 @@ size_t myStrlen( const char* line ) {
 }
 
 char* myStrcpy( char* strDestination, const char *strSource ) {
+    assert( strDestination != NULL );
+    assert( strSource != NULL );
     
     int index = 0;
     
@@ -63,6 +68,8 @@ char* myStrcpy( char* strDestination, const char *strSource ) {
 }
 
 char* myStrncpy( char* strDest, const char* strSource, size_t count ) {
+    assert( strDest != NULL );
+    assert( strSource != NULL );
 
     size_t index = 0;
 
@@ -78,6 +85,8 @@ char* myStrncpy( char* strDest, const char* strSource, size_t count ) {
 }
 
 char* myStrcat( char* strDestination, const char* strSource ) {
+    assert( strDestination != NULL );
+    assert( strSource != NULL );
 
     int indexDestination = 0;
 
@@ -95,6 +104,8 @@ char* myStrcat( char* strDestination, const char* strSource ) {
 }
 
 char* myStrncat( char* strDestination, const char* strSource, size_t count ) {
+    assert( strDestination != NULL );
+    assert( strSource != NULL );
 
     size_t indexDestination = 0;
 
@@ -129,6 +140,7 @@ int myAtoi( const char* line) {
 }
 
 char* myFgets( char* str, int numChars, FILE* stream ) {
+    assert( stream != NULL );
 
     int index = 0, c = '0';
 
