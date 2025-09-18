@@ -2,6 +2,7 @@
 
 #include <malloc.h>
 #include <assert.h>
+#include <ctype.h>
 
 int myPuts( const char* line ) {
     
@@ -216,4 +217,31 @@ ssize_t myGetline( char** line, size_t* n, FILE* stream ) {
     
     return indexCopyLine;
 
+}
+
+int myStrcmp( const char* first,  const char* second, int key ){
+    size_t index = 0;
+    if ( key == 0 ){
+        while( ( toupper(*(first+index)) == toupper(*(second+index)) )&&
+                *(first+index) != '\0' && *(second+index) != '\0' ){
+            ++index;
+        }
+        return toupper(*(first+index)) - toupper(*(second+index));
+    }
+
+    size_t firstSize = myStrlen( first ), secondSize = myStrlen( second );
+    // Clean Last letter
+    while ( isalpha( *(first + firstSize - 1) ) == 0 ){
+        --firstSize;
+    }
+    while ( isalpha( *(second + secondSize - 1) ) == 0 ){
+        --secondSize;
+    }
+    // Compare string
+    while( ( toupper(*(first + firstSize - 1)) == toupper(*(second + secondSize - 1)) ) &&
+             firstSize > 0 && secondSize > 0 ){
+                --firstSize;
+                --secondSize;
+             }
+    return toupper(*(first + firstSize - 1)) - toupper(*(second + secondSize - 1));
 }

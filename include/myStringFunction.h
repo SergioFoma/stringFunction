@@ -134,4 +134,6 @@ char* myStrdup( const char* line );
 //---------------------------------------------------------------------------------------------------
 ssize_t myGetline( char** line, size_t* n, FILE* stream );
 
+int myStrcmp( const char* first, const char* second, int key );
+
 #endif

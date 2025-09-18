@@ -15,6 +15,12 @@ int main( int argc, char** argv) {
         }
         return 0;
     }
+    else if( argc > 1 && strcmp( argv[1], "--bufer" ) == 0 ) {
+        if ( !workWithBuffer() ){
+            printf("\nError with open file and read from him\n");
+        }
+        return 0;
+    }
     else if( argc > 1 && strcmp( argv[1], "--text" ) == 0 ) {
         printText();
     }

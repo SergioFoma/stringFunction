@@ -72,5 +72,4 @@ void testMyFunction() {
     const char* myLine = "123";
     int tryAtoi = myAtoi( myLine );
     printf("line 123 like number: %d", tryAtoi );
-
 }
