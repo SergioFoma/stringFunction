@@ -1,5 +1,6 @@
 #include "parsingText.h"
 #include "myStringFunction.h"
+#include "preparatoryTask.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -200,23 +201,24 @@ void myQsort( void* list, size_t count, size_t sizeInBytes,
                 assert( list != NULL );
                 assert( compare != NULL );
 
-                if( count == 1 || count == 0){
+                if( count  <= 2){
+                    return ;
+                }
+                if( count == 3 ){
+                    sortByFirstLetter( (char**)list, 3);
                     return ;
                 }
 
-                size_t midleIndex = count / 2 , min = 0, max = count;
-                for( size_t iteration = 0; iteration < count; iteration++){
-                    for( size_t low = 0; low < count; low++){
-                        min = ( low <= midleIndex) ? low: midleIndex;
-                        max = low + midleIndex - min;
-                        if( compare( (char**)list+ min , (char**)list + max )  > 0 ){
-                            char* tmp = *((char**)list+ min );
-                            *((char**)list+ min ) = *((char**)list + max );
-                            *((char**)list + max ) = tmp;
-                        }
+                size_t baseIndex = 0,  indexMaxEl = count - 1, i = 0;
+                for( size_t j = baseIndex; j <= indexMaxEl; j++){
+
+                    if( compare( (char**)list + j, (char**)list + indexMaxEl) <= 0 ){
+                        changeLine( (char**)list + i, (char**)list + j );
+                        ++i;
                     }
                 }
+                changeLine( (char**)list + i, (char**)list + indexMaxEl );
 
-                myQsort( (char**)list, midleIndex , sizeInBytes, compare );
-                myQsort( (char**)list + midleIndex  , count - midleIndex , sizeInBytes, compare);
+                myQsort( (char**)list, i , sizeInBytes, compare );
+                myQsort( (char**)list + i  , count - i , sizeInBytes, compare);
 }
