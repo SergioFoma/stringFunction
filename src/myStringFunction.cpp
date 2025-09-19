@@ -220,6 +220,9 @@ ssize_t myGetline( char** line, size_t* n, FILE* stream ) {
 }
 
 int myStrcmp( const char* first,  const char* second, int key ){
+    assert( first != NULL );
+    assert( second != NULL );
+    
     size_t index = 0;
     if ( key == 0 ){
         while( ( toupper(*(first+index)) == toupper(*(second+index)) )&&
@@ -244,4 +247,14 @@ int myStrcmp( const char* first,  const char* second, int key ){
                 --secondSize;
              }
     return toupper(*(first + firstSize - 1)) - toupper(*(second + secondSize - 1));
+}
+
+char* cleanLine( char* lineFromText) {
+    assert( lineFromText != NULL);
+
+    size_t index = 0, sizeOfLine = myStrlen( lineFromText );
+    while( isalpha( *(lineFromText + index ) ) == 0 ) {
+        ++index;
+    }
+    return lineFromText + index;
 }

@@ -11,64 +11,6 @@
 const int sortByFirst  = 0; // Sort by first letter
 const int sortByLast = 1; // Sort by last letter
 
-bool readText() {
-
-    const size_t countLine = 5;
-    const size_t maxLen = 50;
-
-    char* text[ countLine ] = {};
-    FILE* file = fopen("ReadFromText.txt", "r");
-
-    if ( file == NULL ) {
-        return false;
-    }
-
-    char line[ maxLen ] = "\0";
-    for ( size_t numberLine = 0; numberLine < countLine; numberLine++ ){
-        myFgets( line, maxLen, file);
-        char* correctLine = cleanLine( line );
-        char* lineFromText = myStrdup( correctLine );
-
-        if ( lineFromText == NULL ) {
-            printf("\nmemory allocation error.\n");
-            return false;
-        }
-        
-        text[ numberLine ] = lineFromText;
-    }
-
-    changeLine( text + 0, text + 1 ); // Change str - just fun
-
-    for( size_t index = 0; index < countLine; index++ ){
-        printf("%d %s", myStrlen( *(text+index) ), *(text+index) );
-        free( *(text+ index) );
-    }
-
-    fclose( file );
-
-    return true;
-}
-
-void printText() {
-    const size_t maxLen = 50;
-    const size_t count = 5;
-
-    char text[ count ][ maxLen ] = { };
-    FILE* File = fopen("ReadFromText.txt", "r");
-
-    for ( size_t line = 0; line < count; line++ ) {
-        myFgets( text[ line ], maxLen, File );
-    }
-
-    doSwap( text[0], text[1] , maxLen );
-
-    for ( size_t line = 0; line < count; line++ ) {
-        printf("%s", text[ line ] );
-    }
-
-    fclose( File );
-}
-
 bool workWithBuffer() {
     size_t sizeArrayFromFile = getFileSize();
 
@@ -96,9 +38,11 @@ bool workWithBuffer() {
     }
     
     printf("\n\nTEST SORT ¹1\n\n");
-    sortByFirstLetter( arrayOfStr, arrayStrSize );
+    //sortByFirstLetter( arrayOfStr, arrayStrSize ); //my Buble sort
+    //qsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
+    myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
     for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
-        printf("Line ¹%u stroka by sort: %s\n",strIndex, *(arrayOfStr + strIndex) );
+        printf("Line ¹%u stroka by first sort: %s\n",strIndex, *(arrayOfStr + strIndex) );
     }
 
     size_t count = printfForFile( arrayOfStr, arrayStrSize, "\nSorting by the first letter\n\n", "w" );
@@ -108,9 +52,11 @@ bool workWithBuffer() {
     }
 
     printf("\n\nTEST SORT ¹2\n\n");
-    sortByLastLetter( arrayOfStr, arrayStrSize );
+    //sortByLastLetter( arrayOfStr, arrayStrSize ); //my Buble sort
+    //qsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
+    myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
     for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
-        printf("Line ¹%u stroka by sort: %s\n",strIndex, *(arrayOfStr + strIndex) );
+        printf("Line ¹%u stroka by second sort: %s\n",strIndex, *(arrayOfStr + strIndex) );
     }
 
     count = printfForFile( arrayOfStr, arrayStrSize, "\n\nSorting by the last letter\n\n", "a" );
@@ -133,41 +79,6 @@ bool workWithBuffer() {
 }
 
 // Functions
-
-char* cleanLine( char* lineFromText) {
-    assert( lineFromText != NULL);
-
-    size_t index = 0, sizeOfLine = myStrlen( lineFromText );
-    while( isalpha( *(lineFromText + index ) ) == 0 ) {
-        ++index;
-    }
-    return lineFromText + index;
-}
-
-void changeLine( char** firstLine, char** secondLine) {
-    assert( firstLine != NULL );
-    assert( (*firstLine) != NULL );
-    assert( secondLine != NULL );
-    assert( (*secondLine) != NULL );
-
-    char* tmp = (*firstLine);
-    (*firstLine) = (*secondLine);
-    (*secondLine) = tmp;
-}
-
-void doSwap( char* line_1, char* line_2, const size_t Size ) {
-    assert( line_1 != NULL );
-    assert( line_2 != NULL );
-    
-    size_t index = 0;
-
-    while( index < Size ) {
-        char tmp = *(line_1 + index );
-        *(line_1 + index ) = *(line_2 + index );
-        *(line_2 + index ) = tmp;
-        ++index;
-    }
-}
 
 size_t getSizeStrArray( char* buffer, size_t fileSize, char simvol ){
     assert( buffer != NULL );
@@ -270,4 +181,42 @@ void getOriginalText( char* bufferFromFile, size_t fileSize ){
     }
 
     *(bufferFromFile + fileSize ) = '\0';
+}
+
+int sortFirstLetter( const void* first, const void* second ){
+    assert( first != NULL );
+    assert( second != NULL );
+    return myStrcmp( *(const char**)first, *(const char**)second, sortByFirst );
+}
+
+int sortLastLetter( const void* first, const void* second ){
+    assert( first != NULL );
+    assert( second != NULL );
+    return myStrcmp( *(const char**)first, *(const char**)second, sortByLast );
+}
+
+void myQsort( void* list, size_t count, size_t sizeInBytes, 
+              int (*compare)(const void*, const void*) ){
+                assert( list != NULL );
+                assert( compare != NULL );
+
+                if( count == 1 || count == 0){
+                    return ;
+                }
+
+                size_t midleIndex = count / 2 , min = 0, max = count;
+                for( size_t iteration = 0; iteration < count; iteration++){
+                    for( size_t low = 0; low < count; low++){
+                        min = ( low <= midleIndex) ? low: midleIndex;
+                        max = low + midleIndex - min;
+                        if( compare( (char**)list+ min , (char**)list + max )  > 0 ){
+                            char* tmp = *((char**)list+ min );
+                            *((char**)list+ min ) = *((char**)list + max );
+                            *((char**)list + max ) = tmp;
+                        }
+                    }
+                }
+
+                myQsort( (char**)list, midleIndex , sizeInBytes, compare );
+                myQsort( (char**)list + midleIndex  , count - midleIndex , sizeInBytes, compare);
 }

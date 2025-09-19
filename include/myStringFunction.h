@@ -136,4 +136,6 @@ ssize_t myGetline( char** line, size_t* n, FILE* stream );
 
 int myStrcmp( const char* first, const char* second, int key );
 
+char* cleanLine( char* lineFromText );
+
 #endif

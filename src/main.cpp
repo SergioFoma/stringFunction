@@ -2,6 +2,7 @@
 #include "myStringFunction.h"
 #include "parsingText.h"
 #include "testStringFunction.h"
+#include "preparatoryTask.h"
 
 #include <stdio.h>
 #include <stdlib.h>
