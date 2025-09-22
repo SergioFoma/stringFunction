@@ -1,6 +1,7 @@
 #include "onegin.h"
 #include "myStringFunction.h"
 #include "preparatoryTask.h"
+#include "paint.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,22 +16,22 @@ const int sortByLast = 1; // Sort by last letter
 bool workWithBuffer() {
     size_t sizeArrayFromFile = getFileSize();
 
-    printf("Size of file in bytes: %d\n", sizeArrayFromFile );
+    colorPrintf(NOMODE, YELLOW, "Size of file in bytes: %d\n", sizeArrayFromFile );
 
     char* bufferFromFile = (char*)calloc( sizeArrayFromFile + 1, sizeof( char ) );
     if( bufferFromFile == NULL ){
-        printf("\n\nMemory Error in line %d %s\n\n", __LINE__, __func__ );
+         colorPrintf(NOMODE, RED, "\n\nMemory Error in line %d %s\n\n", __LINE__, __func__ );
         return false;
     }
     FILE* myFile = fopen("ReadFromText.txt", "r");
     if( myFile == NULL ){
-        printf("\n\nNULL ptr %d %s\n\n", __LINE__, __func__);
+        colorPrintf(NOMODE, RED, "\n\nNULL ptr %d %s\n\n", __LINE__, __func__);
         fclose( myFile );
         return false;
     }
     size_t fileSize = fread( bufferFromFile, sizeof( char ), sizeArrayFromFile, myFile );
     if( fileSize == 0 ){
-        printf("\n\nError of read text from file to bufer %d %s\n\n", __LINE__, __func__);
+        colorPrintf(NOMODE, RED, "\n\nError of read text from file to bufer %d %s\n\n", __LINE__, __func__);
     }
     bufferFromFile[ sizeArrayFromFile ] = '\0';
     bufferFromFile[ fileSize ] = '\0';
@@ -38,27 +39,27 @@ bool workWithBuffer() {
     size_t arrayStrSize = getSizeStrArray( bufferFromFile, fileSize, '\n' );
     char** arrayOfStr = (char**)calloc( arrayStrSize, sizeof( char* ) );
     if ( arrayOfStr == NULL ){
-        printf("\n\nMemory error in line %d %s\n\n", __LINE__, __func__ );
+        colorPrintf(NOMODE, RED, "\n\nMemory error in line %d %s\n\n", __LINE__, __func__ );
         fclose( myFile );
         return false;
     }
-    printf("Count of str: %u\n", arrayStrSize );
+    colorPrintf(NOMODE, YELLOW, "Count of str: %u\n", arrayStrSize );
     getArrayOfStr( arrayOfStr, bufferFromFile,  fileSize, '\0' );
     
-    printf("\n\nTEST SORT ¹1\n\n");
+    colorPrintf(NOMODE, GREEN, "\n\nTEST SORT ¹1\n\n");
     myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
     size_t count = printfForFile( arrayOfStr, arrayStrSize, "\nSorting by the first letter\n\n", "w" );
     if ( count == 0){
-        printf("\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__);
+        colorPrintf(NOMODE, RED, "\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__);
         fclose( myFile );
         return false;
     }
 
-    printf("\n\nTEST SORT ¹2\n\n");
+    colorPrintf(NOMODE, GREEN, "\n\nTEST SORT ¹2\n\n");
     myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
     count = printfForFile( arrayOfStr, arrayStrSize, "\n\nSorting by the last letter\n\n", "a" );
     if ( count == 0){
-        printf("\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__);
+        colorPrintf(NOMODE, RED, "\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__);
         fclose( myFile );
         return false;
     }
@@ -66,7 +67,7 @@ bool workWithBuffer() {
     getOriginalText( bufferFromFile, fileSize );
     count = printfForFile( &bufferFromFile, 1, "\n\nThe original text\n\n", "a" );
     if ( count == 0){
-        printf("\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__ );
+        colorPrintf(NOMODE, RED, "\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__ );
         fclose( myFile );
         return false;
     }

@@ -3,6 +3,7 @@
 #include "onegin.h"
 #include "testStringFunction.h"
 #include "preparatoryTask.h"
+#include "paint.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,7 @@
 int main( int argc, char** argv) {
     if ( argc > 1 && strcmp( argv[1], "--read" ) == 0) {
         if( !readText() ){
-            printf("\nError of open file %d %s\n", __LINE__, __func__);
+            colorPrintf(NOMODE, RED,"\nError of open file %d %s\n", __LINE__, __func__);
         }
         return 0;
     }
