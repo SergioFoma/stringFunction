@@ -144,6 +144,7 @@ int myAtoi( const char* line) {
 
 char* myFgets( char* str, int numChars, FILE* stream ) {
     assert( stream != NULL );
+    assert( str != NULL );
 
     int index = 0, c = '0';
 
