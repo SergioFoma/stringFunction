@@ -15,7 +15,7 @@ const int sortByLast = 1; // Sort by last letter
 bool workWithBuffer() {
     size_t sizeArrayFromFile = getFileSize();
 
-    printf("Size of file in bayts: %d\n", sizeArrayFromFile );
+    printf("Size of file in bytes: %d\n", sizeArrayFromFile );
 
     char* bufferFromFile = (char*)calloc( sizeArrayFromFile + 1, sizeof( char ) );
     if( bufferFromFile == NULL ){
@@ -23,32 +23,40 @@ bool workWithBuffer() {
         return false;
     }
     FILE* myFile = fopen("ReadFromText.txt", "r");
+    if( myFile == NULL ){
+        printf("NULL ptr %d %s", __LINE__, __func__);
+        fclose( myFile );
+        return false;
+    }
     size_t fileSize = fread( bufferFromFile, sizeof( char ), sizeArrayFromFile, myFile );
     bufferFromFile[ sizeArrayFromFile ] = '\0';
+    bufferFromFile[ fileSize ] = '\0';
 
     size_t arrayStrSize = getSizeStrArray( bufferFromFile, fileSize, '\n' );
     char** arrayOfStr = (char**)calloc( arrayStrSize, sizeof( char ) );
     if ( arrayOfStr == NULL ){
-        printf("\nMemory error in lines 105\n");
+        printf("\nMemory error in line %d %s\n", __LINE__, __func__ );
+        fclose( myFile );
         return false;
     }
     printf("Count of str: %u\n", arrayStrSize );
     getArrayOfStr( arrayOfStr, bufferFromFile,  fileSize, '\0' );
-    for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
+    /*for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
         printf("Str[ %u ] = %s\n", strIndex, *(arrayOfStr + strIndex) );
-    }
+    }*/
     
     printf("\n\nTEST SORT ¹1\n\n");
     //sortByFirstLetter( arrayOfStr, arrayStrSize ); //my Buble sort
     //qsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
     myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
-    for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
+    /*for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
         printf("Line ¹%u stroka by first sort: %s\n",strIndex, *(arrayOfStr + strIndex) );
-    }
+    }*/
 
     size_t count = printfForFile( arrayOfStr, arrayStrSize, "\nSorting by the first letter\n\n", "w" );
     if ( count == 0){
-        printf("\n\nERROR OF OPEN FILE in line 110\n\n");
+        printf("\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__);
+        fclose( myFile );
         return false;
     }
 
@@ -56,20 +64,22 @@ bool workWithBuffer() {
     //sortByLastLetter( arrayOfStr, arrayStrSize ); //my Buble sort
     //qsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
     myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
-    for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
+    /*for( size_t strIndex = 0; strIndex < arrayStrSize; strIndex++ ){
         printf("Line ¹%u stroka by second sort: %s\n",strIndex, *(arrayOfStr + strIndex) );
-    }
+    }*/
 
     count = printfForFile( arrayOfStr, arrayStrSize, "\n\nSorting by the last letter\n\n", "a" );
     if ( count == 0){
         printf("\n\nERROR OF OPEN FILE in line 122\n\n");
+        fclose( myFile );
         return false;
     }
 
     getOriginalText( bufferFromFile, fileSize );
     count = printfForFile( &bufferFromFile, 1, "\n\nThe original text\n\n", "a" );
     if ( count == 0){
-        printf("\n\nERROR OF OPEN FILE in line 128\n\n");
+        printf("\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__ );
+        fclose( myFile );
         return false;
     }
 
@@ -157,14 +167,25 @@ size_t printfForFile( char** arrayOfStr, size_t arrayStrSize, char* key, const c
     assert( mode != NULL );
 
     FILE* printFile = fopen("CorrectPoem.txt", mode);
-    fputs(key, printFile);
+    if ( printFile == NULL ){
+        printf("\nmode = %s nNull ptr %d %s\n",mode,  __LINE__, __func__ );
+        fclose( printFile );
+        return 0;
+    }
+    if ( fputs(key, printFile) == EOF ){
+        printf("\n%s Error to write a key %d %s\n", mode,  __LINE__, __func__ );
+        fclose( printFile );
+        return 0;
+    }
     for( size_t index = 0; index < arrayStrSize; index++){
-        if ( fputs( *(arrayOfStr+index), printFile) == EOF ){
-            printf("\nError of open file to print in line 239\n");
+        if ( myStrlen( *(arrayOfStr + index ) ) > 0 && fputs( *(arrayOfStr+index), printFile) == EOF ){
+            printf("\nError of open file to print in line %d %s\n",__LINE__, __func__);
+            fclose( printFile );
             return 0;
         }
         if( fputc( '\n', printFile ) == EOF ){
-            printf("\nError of open file to print in line 243\n");
+            printf("\nError of open file to print in line %d %s\n", __LINE__, __func__);
+            fclose( printFile );
             return 0;
         }
     }
@@ -201,16 +222,12 @@ void myQsort( void* list, size_t count, size_t sizeInBytes,
                 assert( list != NULL );
                 assert( compare != NULL );
 
-                if( count  <= 2){
-                    return ;
-                }
-                if( count == 3 ){
-                    sortByFirstLetter( (char**)list, 3);
+                if( count  < 2){
                     return ;
                 }
 
                 size_t baseIndex = 0,  indexMaxEl = count - 1, i = 0;
-                for( size_t j = baseIndex; j <= indexMaxEl; j++){
+                for( size_t j = baseIndex; j < indexMaxEl; j++){
 
                     if( compare( (char**)list + j, (char**)list + indexMaxEl) <= 0 ){
                         changeLine( (char**)list + i, (char**)list + j );

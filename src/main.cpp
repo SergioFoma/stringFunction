@@ -9,7 +9,6 @@
 #include <unistd.h>
 
 int main( int argc, char** argv) {
-	
     if ( argc > 1 && strcmp( argv[1], "--read" ) == 0) {
         if( !readText() ){
             printf("\nError of open file\n");
@@ -18,7 +17,7 @@ int main( int argc, char** argv) {
     }
     else if( argc > 1 && strcmp( argv[1], "--bufer" ) == 0 ) {
         if ( !workWithBuffer() ){
-            printf("\nError with open file and read from him\n");
+            printf("\nError with open file and read from him %d %s\n", __LINE__, __func__);
         }
         return 0;
     }

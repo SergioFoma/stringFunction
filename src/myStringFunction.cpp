@@ -47,7 +47,9 @@ size_t myStrlen( const char* line ) {
     
     int index = 0;
     
-    while ( line[ index++ ] != '\0' );
+    while ( line[ index ] != '\0' ){
+        ++index;
+    }
     
     return index;
 }
@@ -223,6 +225,13 @@ int myStrcmp( const char* first,  const char* second, int key ){
     assert( first != NULL );
     assert( second != NULL );
     
+    if( myStrlen( first ) == 0 ){
+        return -1;
+    }
+    else if( myStrlen( second ) == 0 ){
+        return 1;
+    }
+
     size_t index = 0;
     if ( key == 0 ){
         while( ( toupper(*(first+index)) == toupper(*(second+index)) )&&
@@ -253,7 +262,7 @@ char* cleanLine( char* lineFromText) {
     assert( lineFromText != NULL);
 
     size_t index = 0, sizeOfLine = myStrlen( lineFromText );
-    while( isalpha( *(lineFromText + index ) ) == 0 ) {
+    while( index < sizeOfLine && isalpha( *(lineFromText + index ) ) == 0 ) {
         ++index;
     }
     return lineFromText + index;
