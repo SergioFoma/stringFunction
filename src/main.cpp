@@ -18,7 +18,7 @@ int main( int argc, char** argv) {
     }
     else if( argc > 1 && strcmp( argv[1], "--onegin" ) == 0 ) {
         if ( !workWithBuffer() ){
-            printf("\nError with open file and read from him %d %s\n", __LINE__, __func__);
+            colorPrintf(NOMODE, RED, "\nError with open file and read from him %d %s\n", __LINE__, __func__);
         }
         return 0;
     }

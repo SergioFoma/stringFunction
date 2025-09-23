@@ -1,5 +1,6 @@
 #include "preparatoryTask.h"
 #include "myStringFunction.h"
+#include "paint.h"
 
 #include <assert.h>
 // Decosion dy array with char*
@@ -22,7 +23,7 @@ bool readText() {
         char* lineFromText = myStrdup( correctLine );
 
         if ( lineFromText == NULL ) {
-            printf("\nmemory allocation error.\n");
+            colorPrintf(NOMODE, RED,"\nmemory allocation error.\n");
             return false;
         }
         
@@ -32,7 +33,7 @@ bool readText() {
     changeLine( text + 0, text + 1 ); // Change str - just fun
 
     for( size_t index = 0; index < countLine; index++ ){
-        printf("%d %s", myStrlen( *(text+index) ), *(text+index) );
+        colorPrintf(NOMODE, GREEN, "%d %s", myStrlen( *(text+index) ), *(text+index) );
         free( *(text+ index) );
     }
 
@@ -56,7 +57,7 @@ void printText() {
     doSwap( text[0], text[1] , maxLen );
 
     for ( size_t line = 0; line < count; line++ ) {
-        printf("%s", text[ line ] );
+        colorPrintf(NOMODE, GREEN, "%s", text[ line ] );
     }
 
     fclose( File );

@@ -144,7 +144,7 @@ size_t getFileSize(){
     struct stat fileText;
     int status = stat("ReadFromText.txt", &fileText );
     
-    printf("Status of reading: %d\n", status );
+    colorPrintf(NOMODE, YELLOW, "Status of reading: %d\n", status );
 
     return fileText.st_size;
 }
@@ -157,23 +157,23 @@ size_t printfForFile( char** arrayOfStr, size_t arrayStrSize, char* key, const c
 
     FILE* printFile = fopen("CorrectPoem.txt", mode);
     if ( printFile == NULL ){
-        printf("\nmode = %s nNull ptr %d %s\n",mode,  __LINE__, __func__ );
+        colorPrintf(NOMODE, RED, "\nmode = %s nNull ptr %d %s\n",mode,  __LINE__, __func__ );
         fclose( printFile );
         return 0;
     }
     if ( fputs(key, printFile) == EOF ){
-        printf("\n%s Error to write a key %d %s\n", mode,  __LINE__, __func__ );
+        colorPrintf(NOMODE, RED, "\n%s Error to write a key %d %s\n", mode,  __LINE__, __func__ );
         fclose( printFile );
         return 0;
     }
     for( size_t index = 0; index < arrayStrSize; index++){
         if ( myStrlen( *(arrayOfStr + index ) ) > 0 && fputs( *(arrayOfStr+index), printFile) == EOF ){
-            printf("\nError of open file to print in line %d %s\n",__LINE__, __func__);
+            colorPrintf(NOMODE, RED, "\nError of open file to print in line %d %s\n",__LINE__, __func__);
             fclose( printFile );
             return 0;
         }
         if( fputc( '\n', printFile ) == EOF ){
-            printf("\nError of open file to print in line %d %s\n", __LINE__, __func__);
+            colorPrintf(NOMODE, RED, "\nError of open file to print in line %d %s\n", __LINE__, __func__);
             fclose( printFile );
             return 0;
         }
