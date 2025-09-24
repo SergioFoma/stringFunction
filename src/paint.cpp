@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <assert.h>
 
 const char* getColorString( Colors color ) {
     switch (color) {
@@ -58,7 +59,8 @@ const char* getStyleString( Styles style ) {
 }
 
 void colorPrintf( Styles style, Colors color,  const char* line ... ) {
-
+    assert( line != NULL );
+    
     va_list args; // объявляем указатель
     va_start( args, line ); // связываем args с первым необязательным параметром. va_list как указатель
 
@@ -88,7 +90,11 @@ void squareHelp() {
 }
 
 int printfError_(const char* file, const char* function, int line, const char* lineForError ...){
-    
+    assert( file != NULL );
+    assert( function != NULL );
+    assert( line != NULL );
+    assert( lineForError != NULL );
+
     va_list args; // объявляем указатель
     va_start( args, lineForError ); // связываем args с первым необязательным параметром. va_list как указатель
 

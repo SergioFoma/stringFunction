@@ -8,6 +8,12 @@
 struct bufferInformation{
     char* buffer;
     size_t bufferSize;
+    size_t fileSize;
+};
+
+struct strInformation{
+    char** arrayOfStr;
+    size_t arraySize;
 };
 
 //--------------------------------------------------------------------------------------------------------
@@ -31,7 +37,7 @@ bool workWithBuffer( char* nameFileForRead, char* nameFileForWrite);
 //!        and splits it into lines using the specified character.
 //!
 //------------------------------------------------------------------------------------------------------------
-void getArrayOfStr( char** arrayOfStr, char* buffer,  size_t fileSize, char simvol );
+void getArrayOfStr( strInformation *stringFromFile, bufferInformation *bufferFromText, char simvol );
 
 //-----------------------------------------------------------------------------------------------------------
 //!
@@ -44,7 +50,7 @@ void getArrayOfStr( char** arrayOfStr, char* buffer,  size_t fileSize, char simv
 //! @brief counts the number of lines in a file.
 //!
 //-------------------------------------------------------------------------------------------------------------
-size_t getSizeStrArray( char* buffer, size_t fileSize, char simbol );
+size_t getSizeStrArray( bufferInformation *bufferFromFile, char simbol );
 
 //-------------------------------------------------------------------------------------------------------------
 //!
@@ -54,7 +60,7 @@ size_t getSizeStrArray( char* buffer, size_t fileSize, char simbol );
 //! @brief implements bubble sorting by the beginning of rows.
 //!
 //-------------------------------------------------------------------------------------------------------------
-void sortByFirstLetter( char** arrayOfStr, size_t arrayStrSize );
+void sortByFirstLetter( strInformation *stringFromFile );
 
 //-------------------------------------------------------------------------------------------------------------
 //!
@@ -64,7 +70,7 @@ void sortByFirstLetter( char** arrayOfStr, size_t arrayStrSize );
 //! @brief implements bubble sorting by the end of rows.
 //!
 //-------------------------------------------------------------------------------------------------------------
-void sortByLastLetter( char** arrayOfStr, size_t arrayStrSize );
+void sortByLastLetter( strInformation *stringFromFile );
 
 //-------------------------------------------------------------------------------------------------------------
 //!
@@ -78,7 +84,7 @@ void sortByLastLetter( char** arrayOfStr, size_t arrayStrSize );
 //! @brief prints an array of strings to the output file.
 //!
 //---------------------------------------------------------------------------------------------------------------
-size_t printfForFile( char** arrayOfStr, size_t arrayStrSize,char* nameFileForWrite, char* key, const char* mode);
+bool printfForFile( char** array, size_t size,char* nameFileForWrite, char* key, const char* mode);
 
 //---------------------------------------------------------------------------------------------------------------
 //!
@@ -95,7 +101,7 @@ void getFileSize( bufferInformation* bufferFromFile );
 //! @brief Changes all characters \n to \0 in the limit of the array.
 //!
 //-------------------------------------------------------------------------------------------------------------
-void getOriginalText( char* bufferFromFile, size_t fileSize );
+void getOriginalText( bufferInformation *bufferFromFile );
 
 //------------------------------------------------------------------------------------------------------------
 //!
@@ -136,11 +142,11 @@ int sortLastLetter( const void* first, const void* second );
 void myQsort( void* list, size_t count, size_t sizeInBytes, 
               int (*compare)(const void*, const void*) );
 
-bool readFromFile( bufferInformation *bufferFromFile, size_t *fileSize, FILE* myFile );
+bool readFromFile( bufferInformation *bufferFromFile, FILE* myFile );
 
-char** splitToLines( char* bufferFromFile, size_t *arrayStrSize, size_t fileSize, FILE* myFile );
+bool splitToLines( bufferInformation* bufferFromFile, strInformation *stringFromFile, FILE* myFile );
 
-bool sortingRows( char** arrayOfStr, size_t arrayStrSize, char* textForFirstPrint, 
+bool sortingRows( strInformation *stringFromFile, char* textForFirstPrint, 
                   char* textForSecondPrint, char* nameFileForOperation, size_t *count, const int key, char* mode,  FILE* myFile);
 #endif
 

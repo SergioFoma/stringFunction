@@ -15,44 +15,49 @@ const int sortByLast = 1; // Sort by last letter
 
 bool workWithBuffer( char* nameFileForRead, char* nameFileForWrite) {
     bufferInformation bufferFromFile = {};
+    strInformation stringFromFile = {};
+
     getFileSize( &bufferFromFile );
-    size_t fileSize          = 0;
-    size_t arrayStrSize      = 0;
     size_t count             = 0;
 
     colorPrintf(NOMODE, YELLOW, "Size of file in bytes: %d\n", bufferFromFile.bufferSize );
 
     FILE* myFile = fopen( nameFileForRead, "r");
-    readFromFile( bufferFromFile, &fileSize, myFile );
+    if ( !readFromFile( &bufferFromFile, myFile ) ){
+        return false;
+    }
     
-    char** arrayOfStr = splitToLines( bufferFromFile, &arrayStrSize, fileSize, myFile );
+    if ( !splitToLines( &bufferFromFile, &stringFromFile, myFile ) ){
+        return false;
+    }
     
-    if (!sortingRows( arrayOfStr, arrayStrSize, "\n\nTEST SORT ¹1\n\n", "\nSorting by the first letter\n\n",
+    if (!sortingRows( &stringFromFile, "\n\nTEST SORT ¹1\n\n", "\nSorting by the first letter\n\n",
                       nameFileForWrite, &count, sortByFirst, "w", myFile) ){
         return false;
     }
 
-    if (!sortingRows( arrayOfStr, arrayStrSize, "\n\nTEST SORT ¹2\n\n",  "\nSorting by the second letter\n\n",
+    if (!sortingRows( &stringFromFile, "\n\nTEST SORT ¹2\n\n",  "\nSorting by the second letter\n\n",
                       nameFileForWrite, &count, sortByLast,"a", myFile) ){
         return false;
     }
 
-    getOriginalText( bufferFromFile, fileSize );
-    count = printfForFile( &bufferFromFile, 1, nameFileForWrite, "\n\nThe original text\n\n", "a" );
-    if ( count == 0){
+    getOriginalText( &bufferFromFile );
+    if ( !printfForFile( &(bufferFromFile.buffer), 1, nameFileForWrite, "\n\nThe original text\n\n", "a" ) ) {
         printfError("\n\nERROR OF OPEN FILE\n\n");
         fclose( myFile );
         return false;
     }
 
-    free( bufferFromFile );
-    free( arrayOfStr );
+    free( bufferFromFile.buffer );
+    free( stringFromFile.arrayOfStr );
     fclose( myFile );
     return true;
 }
 
 // Functions
-bool readFromFile( bufferInformation *bufferFromFile, size_t *fileSize, FILE* myFile){
+bool readFromFile( bufferInformation *bufferFromFile, FILE* myFile){
+    assert( bufferFromFile != NULL );
+
     if( myFile == NULL ){
         printfError("\n\nNULL ptr\n\n");
         fclose( myFile );
@@ -63,41 +68,51 @@ bool readFromFile( bufferInformation *bufferFromFile, size_t *fileSize, FILE* my
          printfError("\n\nMemory Error\n\n");
         return false;
     }
-    (*fileSize) = fread( bufferFromFile->buffer, sizeof( char ), bufferFromFile->bufferSize, myFile );
-    if( fileSize == 0 ){
+    bufferFromFile->fileSize = fread( bufferFromFile->buffer, sizeof( char ), bufferFromFile->bufferSize, myFile );
+    if( bufferFromFile->fileSize == 0 ){
         printfError("\n\nError of read text from file to bufer\n\n");
     }
     (bufferFromFile->buffer)[ bufferFromFile->bufferSize ]= '\0';
-    (bufferFromFile->buffer)[ (*fileSize) ] = '\0';
+    (bufferFromFile->buffer)[ bufferFromFile->fileSize ] = '\0';
 
     return true;
 }
 
-char** splitToLines( char* bufferFromFile, size_t *arrayStrSize, size_t fileSize, FILE* myFile ){
-    (*arrayStrSize) = getSizeStrArray( bufferFromFile, fileSize, '\n' );
-    char** arrayOfStr = (char**)calloc( (*arrayStrSize), sizeof( char* ) );
-    if ( arrayOfStr == NULL ){
+bool splitToLines( bufferInformation *bufferFromFile, strInformation *stringFromFile, FILE* myFile ){
+    assert( bufferFromFile != NULL );
+    assert( stringFromFile != NULL );
+    assert( myFile != NULL );
+
+    stringFromFile->arraySize = getSizeStrArray( bufferFromFile, '\n' );
+    (stringFromFile->arrayOfStr) = (char**)calloc( stringFromFile->arraySize, sizeof( char* ) );
+    if ( (stringFromFile->arrayOfStr) == NULL ){
         printfError("\n\nMemory error\n\n");
         fclose( myFile );
         return false;
     }
-    colorPrintf(NOMODE, YELLOW, "Count of str: %u\n", (*arrayStrSize) );
-    getArrayOfStr( arrayOfStr, bufferFromFile,  fileSize, '\0' );
+    colorPrintf(NOMODE, YELLOW, "Count of str: %u\n", stringFromFile->arraySize );
+    getArrayOfStr( stringFromFile, bufferFromFile, '\0' );
 
-    return arrayOfStr;
+    return true;
 }
 
-bool sortingRows( char** arrayOfStr, size_t arrayStrSize, char* textForFirstPrint, char* textForSecondPrint,
-                 char* nameFileForOperation,size_t *count,const int key, char* mode, FILE* myFile){
+bool sortingRows( strInformation *stringFromFile, char* textForFirstPrint, char* textForSecondPrint,
+                 char* nameFileForOperation, size_t *count, const int key, char* mode, FILE* myFile){
+    assert( stringFromFile != NULL );
+    assert( textForFirstPrint != NULL );
+    assert( textForFirstPrint != NULL );
+    assert( nameFileForOperation != NULL );
+    assert( count != NULL );
+    assert( myFile != NULL );
 
     colorPrintf(NOMODE, GREEN, textForFirstPrint);
     if ( key == sortByFirst){
-        myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
+        myQsort( (stringFromFile->arrayOfStr), (stringFromFile->arraySize), sizeof( char*), sortFirstLetter );
     }
     else{
-        myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
+        myQsort( (stringFromFile->arrayOfStr), (stringFromFile->arraySize), sizeof( char*), sortLastLetter );
     }
-    (*count)= printfForFile( arrayOfStr, arrayStrSize, nameFileForOperation, textForSecondPrint, mode );
+    (*count)= printfForFile( stringFromFile->arrayOfStr, stringFromFile->arraySize, nameFileForOperation, textForSecondPrint, mode );
     if ( (*count) == 0){
         printfError("\n\nERROR OF OPEN FILE\n\n");
         fclose( myFile );
@@ -107,60 +122,58 @@ bool sortingRows( char** arrayOfStr, size_t arrayStrSize, char* textForFirstPrin
     return true;
 }
 
-size_t getSizeStrArray( char* buffer, size_t fileSize, char simbol ){
-    assert( buffer != NULL );
+size_t getSizeStrArray( bufferInformation *bufferFromFile, char simbol ){
+    assert( bufferFromFile != NULL );
 
     size_t arraySize = 1, sizeBuffer = 0;
-    for( ; sizeBuffer < fileSize; sizeBuffer++){
-        if ( *( buffer + sizeBuffer ) == simbol ){
-            *(buffer + sizeBuffer) = '\0';
+    for( ; sizeBuffer < (bufferFromFile->fileSize); sizeBuffer++){
+        if ( (bufferFromFile->buffer)[sizeBuffer] == simbol ){
+            (bufferFromFile->buffer)[sizeBuffer] = '\0';
             ++arraySize;
         }
     }
     return arraySize;
 }
-void getArrayOfStr( char** arrayOfStr, char* buffer, size_t fileSize, char simvol ) {
-    assert( arrayOfStr != NULL );
-    assert( buffer != NULL );
+void getArrayOfStr( strInformation *stringFromFile, bufferInformation *bufferFromFile, char simvol ) {
+    assert( stringFromFile != NULL );
+    assert( bufferFromFile != NULL );
 
     size_t bufferIndex = 0, arrayStrIndex = 1;
-    *arrayOfStr = cleanLine( buffer );
-    for( ; bufferIndex < fileSize; bufferIndex++ ){
-        if ( *( buffer + bufferIndex ) == simvol ) {
-            *( arrayOfStr + arrayStrIndex ) = cleanLine( ( buffer + bufferIndex + 1) );
+    (stringFromFile->arrayOfStr)[0] = cleanLine( (bufferFromFile->buffer) );
+    for( ; bufferIndex < (bufferFromFile->fileSize); bufferIndex++ ){
+        if ( (bufferFromFile->buffer)[bufferIndex] == simvol ) {
+            (stringFromFile->arrayOfStr)[arrayStrIndex] = cleanLine( ( (bufferFromFile->buffer) + bufferIndex + 1) );
             ++arrayStrIndex;
         }
     }
 }
 
-void sortByFirstLetter( char** arrayOfStr, size_t arrayStrSize ){
-    assert( arrayOfStr != NULL );
-    assert( (*arrayOfStr) != NULL );
+void sortByFirstLetter( strInformation *stringFromFile ){
+    assert( stringFromFile != NULL );
 
     char* tmp = "\0";
-    for( size_t firstStep = 0; firstStep < arrayStrSize; firstStep++ ){
-        for( size_t secondStep = 0; secondStep < arrayStrSize - 1; secondStep++ ){
-            if ( myStrcmp( *( arrayOfStr + secondStep ) , *( arrayOfStr + secondStep + 1), sortByFirst ) > 0 ){
-                tmp = *( arrayOfStr + secondStep );
-                *( arrayOfStr + secondStep ) = *( arrayOfStr + secondStep + 1);
-                *( arrayOfStr + secondStep + 1) = tmp;
+    for( size_t firstStep = 0; firstStep < (stringFromFile->arraySize); firstStep++ ){
+        for( size_t secondStep = 0; secondStep < (stringFromFile->arraySize) - 1; secondStep++ ){
+            if ( myStrcmp((stringFromFile->arrayOfStr)[secondStep] , (stringFromFile->arrayOfStr)[secondStep+1], sortByFirst ) > 0 ){
+                tmp = (stringFromFile->arrayOfStr)[secondStep];
+                (stringFromFile->arrayOfStr)[secondStep] = (stringFromFile->arrayOfStr)[secondStep+1];
+                (stringFromFile->arrayOfStr)[secondStep+1] = tmp;
             }
         }
     }
 
 }
 
-void sortByLastLetter( char** arrayOfStr, size_t arrayStrSize ){
-    assert( arrayOfStr != NULL );
-    assert( (*arrayOfStr) != NULL );
+void sortByLastLetter( strInformation *stringFromFile ){
+    assert( stringFromFile != NULL );
 
     char* tmp = "\0";
-    for( size_t firstStep = 0; firstStep < arrayStrSize; firstStep++ ){
-        for( size_t secondStep = 0; secondStep < arrayStrSize - 1; secondStep++ ){
-            if ( myStrcmp( *( arrayOfStr + secondStep ) , *( arrayOfStr + secondStep + 1), sortByLast ) > 0 ){
-                tmp = *( arrayOfStr + secondStep );
-                *( arrayOfStr + secondStep ) = *( arrayOfStr + secondStep + 1);
-                *( arrayOfStr + secondStep + 1) = tmp;
+    for( size_t firstStep = 0; firstStep < (stringFromFile->arraySize); firstStep++ ){
+        for( size_t secondStep = 0; secondStep < (stringFromFile->arraySize) - 1; secondStep++ ){
+            if ( myStrcmp( (stringFromFile->arrayOfStr)[secondStep] , (stringFromFile->arrayOfStr)[secondStep+1], sortByLast ) > 0 ){
+                tmp = (stringFromFile->arrayOfStr)[secondStep];
+                (stringFromFile->arrayOfStr)[secondStep] = (stringFromFile->arrayOfStr)[secondStep+1];
+                (stringFromFile->arrayOfStr)[secondStep+1] = tmp;
             }
         }
     }
@@ -168,6 +181,8 @@ void sortByLastLetter( char** arrayOfStr, size_t arrayStrSize ){
 }
 
 void getFileSize( bufferInformation* bufferFromFile ){
+    assert( bufferFromFile != NULL );
+
     struct stat fileText;
     int status = stat("ReadFromText.txt", &fileText );
     
@@ -175,9 +190,8 @@ void getFileSize( bufferInformation* bufferFromFile ){
     bufferFromFile->bufferSize = fileText.st_size;
 }
 
-size_t printfForFile( char** arrayOfStr, size_t arrayStrSize,char* nameFileForWrite, char* key, const char* mode ){
+bool printfForFile( char** arrayOfStr, size_t arrayStrSize,char* nameFileForWrite, char* key, const char* mode ){
     assert( arrayOfStr != NULL );
-    assert( (*arrayOfStr) != NULL );
     assert( key != NULL );
     assert( mode != NULL );
 
@@ -185,39 +199,39 @@ size_t printfForFile( char** arrayOfStr, size_t arrayStrSize,char* nameFileForWr
     if ( printFile == NULL ){
         printfError("\nNULL PTR\n");
         fclose( printFile );
-        return 0;
+        return false;
     }
     if ( fputs(key, printFile) == EOF ){
         printfError("\n%s Error to write a key\n");
         fclose( printFile );
-        return 0;
+        return false;
     }
     for( size_t index = 0; index < arrayStrSize; index++){
         if ( myStrlen( *(arrayOfStr + index ) ) > 0 && fputs( *(arrayOfStr+index), printFile) == EOF ){
             printfError("\nError of open file and wrint in him\n");
             fclose( printFile );
-            return 0;
+            return false;
         }
         if( fputc( '\n', printFile ) == EOF ){
             printfError("\nError of open file and write in him\n");
             fclose( printFile );
-            return 0;
+            return false;
         }
     }
     fclose( printFile );
-    return 1;
+    return true;
 }
 
-void getOriginalText( char* bufferFromFile, size_t fileSize ){
+void getOriginalText( bufferInformation *bufferFromFile ){
     assert( bufferFromFile != NULL );
 
-    for( size_t index = 0; index < fileSize; index++ ){
-        if( *(bufferFromFile + index) == '\0' ){
-            *(bufferFromFile + index ) = '\n';
+    for( size_t index = 0; index < (bufferFromFile->fileSize); index++ ){
+        if( (bufferFromFile->buffer)[index] == '\0' ){
+            (bufferFromFile->buffer)[index] = '\n';
         }
     }
 
-    *(bufferFromFile + fileSize ) = '\0';
+    (bufferFromFile->buffer)[ (bufferFromFile->fileSize)] = '\0';
 }
 
 int sortFirstLetter( const void* first, const void* second ){
