@@ -13,61 +13,34 @@
 const int sortByFirst  = 0; // Sort by first letter
 const int sortByLast = 1; // Sort by last letter
 
-bool workWithBuffer() {
-    size_t sizeArrayFromFile = getFileSize();
+bool workWithBuffer( char* nameFileForRead, char* nameFileForWrite) {
+    bufferInformation bufferFromFile = {};
+    getFileSize( &bufferFromFile );
+    size_t fileSize          = 0;
+    size_t arrayStrSize      = 0;
+    size_t count             = 0;
 
-    colorPrintf(NOMODE, YELLOW, "Size of file in bytes: %d\n", sizeArrayFromFile );
+    colorPrintf(NOMODE, YELLOW, "Size of file in bytes: %d\n", bufferFromFile.bufferSize );
 
-    char* bufferFromFile = (char*)calloc( sizeArrayFromFile + 1, sizeof( char ) );
-    if( bufferFromFile == NULL ){
-         colorPrintf(NOMODE, RED, "\n\nMemory Error in line %d %s\n\n", __LINE__, __func__ );
-        return false;
-    }
-    FILE* myFile = fopen("ReadFromText.txt", "r");
-    if( myFile == NULL ){
-        colorPrintf(NOMODE, RED, "\n\nNULL ptr %d %s\n\n", __LINE__, __func__);
-        fclose( myFile );
-        return false;
-    }
-    size_t fileSize = fread( bufferFromFile, sizeof( char ), sizeArrayFromFile, myFile );
-    if( fileSize == 0 ){
-        colorPrintf(NOMODE, RED, "\n\nError of read text from file to bufer %d %s\n\n", __LINE__, __func__);
-    }
-    bufferFromFile[ sizeArrayFromFile ] = '\0';
-    bufferFromFile[ fileSize ] = '\0';
-
-    size_t arrayStrSize = getSizeStrArray( bufferFromFile, fileSize, '\n' );
-    char** arrayOfStr = (char**)calloc( arrayStrSize, sizeof( char* ) );
-    if ( arrayOfStr == NULL ){
-        colorPrintf(NOMODE, RED, "\n\nMemory error in line %d %s\n\n", __LINE__, __func__ );
-        fclose( myFile );
-        return false;
-    }
-    colorPrintf(NOMODE, YELLOW, "Count of str: %u\n", arrayStrSize );
-    getArrayOfStr( arrayOfStr, bufferFromFile,  fileSize, '\0' );
+    FILE* myFile = fopen( nameFileForRead, "r");
+    readFromFile( bufferFromFile, &fileSize, myFile );
     
-    colorPrintf(NOMODE, GREEN, "\n\nTEST SORT ¹1\n\n");
-    myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
-    size_t count = printfForFile( arrayOfStr, arrayStrSize, "\nSorting by the first letter\n\n", "w" );
-    if ( count == 0){
-        colorPrintf(NOMODE, RED, "\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__);
-        fclose( myFile );
+    char** arrayOfStr = splitToLines( bufferFromFile, &arrayStrSize, fileSize, myFile );
+    
+    if (!sortingRows( arrayOfStr, arrayStrSize, "\n\nTEST SORT ¹1\n\n", "\nSorting by the first letter\n\n",
+                      nameFileForWrite, &count, sortByFirst, "w", myFile) ){
         return false;
     }
 
-    colorPrintf(NOMODE, GREEN, "\n\nTEST SORT ¹2\n\n");
-    myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
-    count = printfForFile( arrayOfStr, arrayStrSize, "\n\nSorting by the last letter\n\n", "a" );
-    if ( count == 0){
-        colorPrintf(NOMODE, RED, "\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__);
-        fclose( myFile );
+    if (!sortingRows( arrayOfStr, arrayStrSize, "\n\nTEST SORT ¹2\n\n",  "\nSorting by the second letter\n\n",
+                      nameFileForWrite, &count, sortByLast,"a", myFile) ){
         return false;
     }
 
     getOriginalText( bufferFromFile, fileSize );
-    count = printfForFile( &bufferFromFile, 1, "\n\nThe original text\n\n", "a" );
+    count = printfForFile( &bufferFromFile, 1, nameFileForWrite, "\n\nThe original text\n\n", "a" );
     if ( count == 0){
-        colorPrintf(NOMODE, RED, "\n\nERROR OF OPEN FILE in line %d %s\n\n", __LINE__, __func__ );
+        printfError("\n\nERROR OF OPEN FILE\n\n");
         fclose( myFile );
         return false;
     }
@@ -79,18 +52,72 @@ bool workWithBuffer() {
 }
 
 // Functions
+bool readFromFile( bufferInformation *bufferFromFile, size_t *fileSize, FILE* myFile){
+    if( myFile == NULL ){
+        printfError("\n\nNULL ptr\n\n");
+        fclose( myFile );
+        return false;
+    }
+    bufferFromFile->buffer = (char*)calloc( bufferFromFile->bufferSize + 1, sizeof( char ) );
+    if( bufferFromFile->buffer == NULL ){
+         printfError("\n\nMemory Error\n\n");
+        return false;
+    }
+    (*fileSize) = fread( bufferFromFile->buffer, sizeof( char ), bufferFromFile->bufferSize, myFile );
+    if( fileSize == 0 ){
+        printfError("\n\nError of read text from file to bufer\n\n");
+    }
+    (bufferFromFile->buffer)[ bufferFromFile->bufferSize ]= '\0';
+    (bufferFromFile->buffer)[ (*fileSize) ] = '\0';
 
-size_t getSizeStrArray( char* buffer, size_t fileSize, char simvol ){
+    return true;
+}
+
+char** splitToLines( char* bufferFromFile, size_t *arrayStrSize, size_t fileSize, FILE* myFile ){
+    (*arrayStrSize) = getSizeStrArray( bufferFromFile, fileSize, '\n' );
+    char** arrayOfStr = (char**)calloc( (*arrayStrSize), sizeof( char* ) );
+    if ( arrayOfStr == NULL ){
+        printfError("\n\nMemory error\n\n");
+        fclose( myFile );
+        return false;
+    }
+    colorPrintf(NOMODE, YELLOW, "Count of str: %u\n", (*arrayStrSize) );
+    getArrayOfStr( arrayOfStr, bufferFromFile,  fileSize, '\0' );
+
+    return arrayOfStr;
+}
+
+bool sortingRows( char** arrayOfStr, size_t arrayStrSize, char* textForFirstPrint, char* textForSecondPrint,
+                 char* nameFileForOperation,size_t *count,const int key, char* mode, FILE* myFile){
+
+    colorPrintf(NOMODE, GREEN, textForFirstPrint);
+    if ( key == sortByFirst){
+        myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortFirstLetter );
+    }
+    else{
+        myQsort( arrayOfStr, arrayStrSize, sizeof( char*), sortLastLetter );
+    }
+    (*count)= printfForFile( arrayOfStr, arrayStrSize, nameFileForOperation, textForSecondPrint, mode );
+    if ( (*count) == 0){
+        printfError("\n\nERROR OF OPEN FILE\n\n");
+        fclose( myFile );
+        return false;
+    }
+
+    return true;
+}
+
+size_t getSizeStrArray( char* buffer, size_t fileSize, char simbol ){
     assert( buffer != NULL );
 
-    size_t sizeArray = 1, sizeBuffer = 0;
+    size_t arraySize = 1, sizeBuffer = 0;
     for( ; sizeBuffer < fileSize; sizeBuffer++){
-        if ( *( buffer + sizeBuffer ) == simvol ){
+        if ( *( buffer + sizeBuffer ) == simbol ){
             *(buffer + sizeBuffer) = '\0';
-            ++sizeArray;
+            ++arraySize;
         }
     }
-    return sizeArray;
+    return arraySize;
 }
 void getArrayOfStr( char** arrayOfStr, char* buffer, size_t fileSize, char simvol ) {
     assert( arrayOfStr != NULL );
@@ -140,40 +167,39 @@ void sortByLastLetter( char** arrayOfStr, size_t arrayStrSize ){
 
 }
 
-size_t getFileSize(){
+void getFileSize( bufferInformation* bufferFromFile ){
     struct stat fileText;
     int status = stat("ReadFromText.txt", &fileText );
     
     colorPrintf(NOMODE, YELLOW, "Status of reading: %d\n", status );
-
-    return fileText.st_size;
+    bufferFromFile->bufferSize = fileText.st_size;
 }
 
-size_t printfForFile( char** arrayOfStr, size_t arrayStrSize, char* key, const char* mode ){
+size_t printfForFile( char** arrayOfStr, size_t arrayStrSize,char* nameFileForWrite, char* key, const char* mode ){
     assert( arrayOfStr != NULL );
     assert( (*arrayOfStr) != NULL );
     assert( key != NULL );
     assert( mode != NULL );
 
-    FILE* printFile = fopen("CorrectPoem.txt", mode);
+    FILE* printFile = fopen( nameFileForWrite, mode);
     if ( printFile == NULL ){
-        colorPrintf(NOMODE, RED, "\nmode = %s nNull ptr %d %s\n",mode,  __LINE__, __func__ );
+        printfError("\nNULL PTR\n");
         fclose( printFile );
         return 0;
     }
     if ( fputs(key, printFile) == EOF ){
-        colorPrintf(NOMODE, RED, "\n%s Error to write a key %d %s\n", mode,  __LINE__, __func__ );
+        printfError("\n%s Error to write a key\n");
         fclose( printFile );
         return 0;
     }
     for( size_t index = 0; index < arrayStrSize; index++){
         if ( myStrlen( *(arrayOfStr + index ) ) > 0 && fputs( *(arrayOfStr+index), printFile) == EOF ){
-            colorPrintf(NOMODE, RED, "\nError of open file to print in line %d %s\n",__LINE__, __func__);
+            printfError("\nError of open file and wrint in him\n");
             fclose( printFile );
             return 0;
         }
         if( fputc( '\n', printFile ) == EOF ){
-            colorPrintf(NOMODE, RED, "\nError of open file to print in line %d %s\n", __LINE__, __func__);
+            printfError("\nError of open file and write in him\n");
             fclose( printFile );
             return 0;
         }

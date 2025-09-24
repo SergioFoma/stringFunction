@@ -3,6 +3,12 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+struct bufferInformation{
+    char* buffer;
+    size_t bufferSize;
+};
 
 //--------------------------------------------------------------------------------------------------------
 //!
@@ -12,7 +18,7 @@
 //! @brief reads a text file into an array, splits it into lines, sorts it, and writes the result to a file.
 //!
 //-----------------------------------------------------------------------------------------------------------
-bool workWithBuffer();
+bool workWithBuffer( char* nameFileForRead, char* nameFileForWrite);
 
 //------------------------------------------------------------------------------------------------------------
 //!
@@ -38,7 +44,7 @@ void getArrayOfStr( char** arrayOfStr, char* buffer,  size_t fileSize, char simv
 //! @brief counts the number of lines in a file.
 //!
 //-------------------------------------------------------------------------------------------------------------
-size_t getSizeStrArray( char* buffer, size_t fileSize, char simvol );
+size_t getSizeStrArray( char* buffer, size_t fileSize, char simbol );
 
 //-------------------------------------------------------------------------------------------------------------
 //!
@@ -72,14 +78,14 @@ void sortByLastLetter( char** arrayOfStr, size_t arrayStrSize );
 //! @brief prints an array of strings to the output file.
 //!
 //---------------------------------------------------------------------------------------------------------------
-size_t printfForFile( char** arrayOfStr, size_t arrayStrSize, char* key, const char* mode);
+size_t printfForFile( char** arrayOfStr, size_t arrayStrSize,char* nameFileForWrite, char* key, const char* mode);
 
 //---------------------------------------------------------------------------------------------------------------
 //!
 //! @brief gets the size of the text file.
 //!
 //---------------------------------------------------------------------------------------------------------------
-size_t getFileSize();
+void getFileSize( bufferInformation* bufferFromFile );
 
 //---------------------------------------------------------------------------------------------------------------
 //!
@@ -129,4 +135,12 @@ int sortLastLetter( const void* first, const void* second );
 //----------------------------------------------------------------------------------------------------------------
 void myQsort( void* list, size_t count, size_t sizeInBytes, 
               int (*compare)(const void*, const void*) );
+
+bool readFromFile( bufferInformation *bufferFromFile, size_t *fileSize, FILE* myFile );
+
+char** splitToLines( char* bufferFromFile, size_t *arrayStrSize, size_t fileSize, FILE* myFile );
+
+bool sortingRows( char** arrayOfStr, size_t arrayStrSize, char* textForFirstPrint, 
+                  char* textForSecondPrint, char* nameFileForOperation, size_t *count, const int key, char* mode,  FILE* myFile);
 #endif
+

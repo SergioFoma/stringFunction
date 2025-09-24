@@ -12,13 +12,13 @@
 int main( int argc, char** argv) {
     if ( argc > 1 && strcmp( argv[1], "--read" ) == 0) {
         if( !readText() ){
-            colorPrintf(NOMODE, RED,"\nError of open file %d %s\n", __LINE__, __func__);
+            printfError("\nError of open file\n");
         }
         return 0;
     }
     else if( argc > 1 && strcmp( argv[1], "--onegin" ) == 0 ) {
-        if ( !workWithBuffer() ){
-            colorPrintf(NOMODE, RED, "\nError with open file and read from him %d %s\n", __LINE__, __func__);
+        if ( !workWithBuffer( argv[2], argv[3]) ){
+            printfError("\nError with open file and read from him\n");
         }
         return 0;
     }

@@ -86,3 +86,18 @@ void squareHelp() {
     printf("%s", colorReset );
 
 }
+
+int printfError_(const char* file, const char* function, int line, const char* lineForError ...){
+    
+    va_list args; // объявляем указатель
+    va_start( args, lineForError ); // связываем args с первым необязательным параметром. va_list как указатель
+
+    printf("%s", getStyleString( NOMODE ));
+    printf("%s", getColorString( RED ));
+    printf("\nError in %s, in function %s, in line %d\n", file, function, line);
+    vprintf(lineForError, args);
+    printf("%s", colorReset );
+
+    va_end( args );
+    return 0;
+}
