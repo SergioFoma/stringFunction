@@ -8,13 +8,16 @@
 struct bufferInformation{
     char* buffer;
     size_t bufferSize;
-    size_t fileSize;
+    size_t fileSize; // TODO swap bufferSize and bufferSize
 };
 
 struct strInformation{
     char** arrayOfStr;
     size_t arraySize;
 };
+
+// errorCode = initBufferInformation(&buf, "./file.txt")
+// destroyBufferInformation(&buf)
 
 //--------------------------------------------------------------------------------------------------------
 //!
