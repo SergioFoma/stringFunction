@@ -30,7 +30,7 @@ bool readText() {
         text[ numberLine ] = lineFromText;
     }
 
-    changeLine( text + 0, text + 1 ); // Change str - just fun
+    //changeLine( text + 0, text + 1, sizeof( char) ); // Change str - just fun
 
     for( size_t index = 0; index < countLine; index++ ){
         colorPrintf(NOMODE, GREEN, "%d %s", myStrlen( *(text+index) ), *(text+index) );
@@ -65,15 +65,15 @@ void printText() {
 
 // Functions
 
-void changeLine( char** firstLine, char** secondLine) {
+void swap( void* firstLine, void* secondLine, size_t sizeInBytes ) {
     assert( firstLine != NULL );
-    assert( (*firstLine) != NULL );
     assert( secondLine != NULL );
-    assert( (*secondLine) != NULL );
 
-    char* tmp = (*firstLine);
-    (*firstLine) = (*secondLine);
-    (*secondLine) = tmp;
+    for( size_t index = 0; index < sizeInBytes; index++ ){
+        char tmp = *((char*)firstLine + index );
+        *((char*)firstLine + index) = *((char*)secondLine + index);
+        *((char*)secondLine + index) = tmp;
+    }
 }
 
 void doSwap( char* line_1, char* line_2, const size_t Size ) {

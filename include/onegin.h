@@ -7,8 +7,8 @@
 
 struct bufferInformation{
     char* buffer;
+    size_t fileSize;
     size_t bufferSize;
-    size_t fileSize; // TODO swap bufferSize and bufferSize
 };
 
 struct strInformation{
@@ -16,8 +16,11 @@ struct strInformation{
     size_t arraySize;
 };
 
-// errorCode = initBufferInformation(&buf, "./file.txt")
-// destroyBufferInformation(&buf)
+enum errorCode {
+    correct        = 0,
+    fileOpenErr    = 1,
+    memoryErr      = 2
+};
 
 //--------------------------------------------------------------------------------------------------------
 //!
@@ -33,27 +36,27 @@ bool workWithBuffer( char* nameFileForRead, char* nameFileForWrite);
 //!
 //! @param[in] **arrayOfStr    **arrayOfStr - array of pointers.
 //! @param[in] *bufer           *bufer - an array where the entire text file was read.
-//! @param[in] fileSize          fileSize - text file size.
-//! @param[in] simvol           simvol - the character used for splitting into lines.
+//! @param[in] bufferSize          bufferSize - text file size.
+//! @param[in] symbol           symbol - the character used for splitting into lines.
 //!
 //! @brief retrieves the array where the entire text file was read, 
 //!        and splits it into lines using the specified character.
 //!
 //------------------------------------------------------------------------------------------------------------
-void getArrayOfStr( strInformation *stringFromFile, bufferInformation *bufferFromText, char simvol );
+void getArrayOfStr( strInformation *stringFromFile, bufferInformation *bufferFromText, char symbol );
 
 //-----------------------------------------------------------------------------------------------------------
 //!
 //! @param[in] *bufer           *bufer - an array where the entire text file was read.
-//! @param[in] fileSize          fileSize - text file size.
-//! @param[in] simvol           simvol - the character used for splitting into lines.
+//! @param[in] bufferSize          bufferSize - text file size.
+//! @param[in] symbol           symbol - the character used for splitting into lines.
 //!
 //! @return count of lines.
 //!
 //! @brief counts the number of lines in a file.
 //!
 //-------------------------------------------------------------------------------------------------------------
-size_t getSizeStrArray( bufferInformation *bufferFromFile, char simbol );
+size_t getSizeStrArray( bufferInformation *bufferFromFile, char symbol ); 
 
 //-------------------------------------------------------------------------------------------------------------
 //!
@@ -99,7 +102,7 @@ void getFileSize( bufferInformation* bufferFromFile );
 //---------------------------------------------------------------------------------------------------------------
 //!
 //! @param[in] *bufferFromFile      *bufferFromFile - an array in which \n is replaced by \0.
-//! @param[in] fileSize             fileSize - size of bufferFromFile.
+//! @param[in] bufferSize             bufferSize - size of bufferFromFile.
 //!
 //! @brief Changes all characters \n to \0 in the limit of the array.
 //!
@@ -145,7 +148,13 @@ int sortLastLetter( const void* first, const void* second );
 void myQsort( void* list, size_t count, size_t sizeInBytes, 
               int (*compare)(const void*, const void*) );
 
-bool readFromFile( bufferInformation *bufferFromFile, FILE* myFile );
+errorCode initBufferInformation( bufferInformation *bufferFromFile, FILE* myFile );
+
+errorCode initStringInformation( strInformation *stringFromFile );
+
+void destroyBufferInformation( bufferInformation *bufferFromFile );
+
+void destroyStringInformation( strInformation *stringFromFile );
 
 bool splitToLines( bufferInformation* bufferFromFile, strInformation *stringFromFile, FILE* myFile );
 

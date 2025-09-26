@@ -27,7 +27,7 @@ void printText();
 //! @brief swaps to lines.
 //!
 //-----------------------------------------------------------------------------------------------------
-void changeLine( char** firstLine, char** secondLine);
+void swap( void* firstLine, void* secondLine, size_t sizeInBytes);
 
 //----------------------------------------------------------------------------------------------------
 //!
